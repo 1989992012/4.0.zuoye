@@ -75,7 +75,7 @@ static char * number(char * str, int num, int base, int size, int precision
 	if (type&LEFT) type &= ~ZEROPAD;
 	if (base<2 || base>36)
 		return 0;
-	c = (type & ZEROPAD) ? '0' : ' ' ;
+	c = (type & ZEROPAD) ? '0' : ' ' ;  //如果有ZEROPAD则用0填充，否则用空格
 	if (type&SIGN && num<0) {
 		sign='-';
 		num = -num;
@@ -86,15 +86,16 @@ static char * number(char * str, int num, int base, int size, int precision
 		if (base==16) size -= 2;
 		else if (base==8) size--;
 	i=0;
+	//将数值部分转化为字符串传入tmp中
 	if (num==0)
 		tmp[i++]='0';
 	else while (num!=0)
-		tmp[i++]=digits[do_div(num,base)];
+		tmp[i++]=digits[do_div(num,base)];  //重新设置进程
 	if (i>precision) precision=i;
 	size -= precision;
 	if (!(type&(ZEROPAD+LEFT)))
 		while(size-->0)
-			*str++ = ' ';
+			*str++ = ' ';  //设置符号位
 	if (sign)
 		*str++ = sign;
 	if (type&SPECIAL)
@@ -106,13 +107,13 @@ static char * number(char * str, int num, int base, int size, int precision
 		}
 	if (!(type&LEFT))
 		while(size-->0)
-			*str++ = c;
+			*str++ = c; //用0填充
 	while(i<precision--)
-		*str++ = '0';
+		*str++ = '0';  //数字
 	while(i-->0)
 		*str++ = tmp[i];
 	while(size-->0)
-		*str++ = ' ';
+		*str++ = ' ';  //空格填剩下部分
 	return str;
 }
 
@@ -227,7 +228,7 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 				field_width, precision, flags);
 			break;
 
-		case 'x'://十六进制型
+		case 'x'://小写十六进制型
 			flags |= SMALL;
 		case 'X'://大写十六进制
 			str = number(str, va_arg(args, unsigned long), 16,
@@ -258,7 +259,7 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 		}
 	}
 	*str = '\0';//结束
-	return str-buf;
+	return str-buf; //返回字符个数
 }
 
 int sprintf(char * buf, const char *fmt, ...)
